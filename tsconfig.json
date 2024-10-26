@@ -17,11 +17,12 @@
 
     /* Transpilation */
     "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "outDir": "./dist",
 
     /* No DOM code */
     "lib": ["es2022"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
