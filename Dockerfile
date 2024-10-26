@@ -34,7 +34,7 @@ COPY . .
 RUN pnpm run build
 
 # Remove development dependencies
-RUN pnpm prune --prod
+## RUN pnpm prune --prod
 
 
 # Final stage for app image
