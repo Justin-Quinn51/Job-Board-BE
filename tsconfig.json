@@ -24,6 +24,6 @@
     /* No DOM code */
     "lib": ["es2022"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
