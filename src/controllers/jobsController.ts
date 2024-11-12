@@ -8,7 +8,7 @@ import {
   deleteJob,
 } from "../models/jobsModel.ts";
 
-export async function getJobs(req: Request, res: Response) {
+async function getJobs(req: Request, res: Response) {
   try {
     const jobs = await getAllJobs();
     res.status(200).json(jobs);
@@ -18,7 +18,7 @@ export async function getJobs(req: Request, res: Response) {
   }
 }
 
-export async function getJob(req: Request, res: Response) {
+async function getJob(req: Request, res: Response) {
   const jobId = req.params.id;
   try {
     const job = await getJobById(jobId);
@@ -32,7 +32,7 @@ export async function getJob(req: Request, res: Response) {
   }
 }
 
-export async function createJob(req: Request, res: Response) {
+async function createJob(req: Request, res: Response) {
   const { id, job_title, description, date_added, expires, closed, employer } =
     req.body;
   try {
@@ -52,7 +52,7 @@ export async function createJob(req: Request, res: Response) {
   }
 }
 
-export async function updateJobDetails(req: Request, res: Response) {
+async function updateJobDetails(req: Request, res: Response) {
   const jobId = req.params.id;
   const updates = req.body;
 
@@ -68,7 +68,7 @@ export async function updateJobDetails(req: Request, res: Response) {
   }
 }
 
-export async function closeJobById(req: Request, res: Response) {
+async function closeJobById(req: Request, res: Response) {
   const jobId = req.params.id;
   try {
     const closedJob = await closeJob(jobId, true);
@@ -78,7 +78,7 @@ export async function closeJobById(req: Request, res: Response) {
   }
 }
 
-export async function deleteJobById(req: Request, res: Response) {
+async function deleteJobById(req: Request, res: Response) {
   const jobId = req.params.id;
   try {
     await deleteJob(jobId);
@@ -87,3 +87,12 @@ export async function deleteJobById(req: Request, res: Response) {
     res.status(500).json({ error: "Failed to delete job" });
   }
 }
+
+export {
+  getJobs,
+  getJob,
+  createJob,
+  updateJobDetails,
+  closeJobById,
+  deleteJobById,
+};

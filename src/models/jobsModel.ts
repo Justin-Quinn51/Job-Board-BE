@@ -96,11 +96,4 @@ async function deleteJob(id: string) {
   const result = await pool.query(deleteJobQuery, [id]);
 }
 
-module.exports = {
-  getAllJobs,
-  getJobById,
-  createNewJob,
-  updateJob,
-  closeJob,
-  deleteJob,
-};
+export { getAllJobs, getJobById, createNewJob, updateJob, closeJob, deleteJob };
