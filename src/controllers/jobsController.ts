@@ -1,4 +1,4 @@
-import { type Request, type Response } from "express";
+import { type Request, type Response, type NextFunction } from "express";
 import {
   getAllJobs,
   getJobById,
@@ -9,6 +9,8 @@ import {
 } from "../models/jobsModel.ts";
 
 async function getJobs(req: Request, res: Response) {
+  const { closed } = req.params;
+  console.log(closed);
   try {
     const jobs = await getAllJobs();
     res.status(200).json(jobs);
@@ -58,7 +60,11 @@ async function createJob(req: Request, res: Response) {
   }
 }
 
-async function updateJobDetails(req: Request, res: Response) {
+async function updateJobDetails(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   const jobId = req.params.id;
   const updates = req.body;
 
@@ -74,6 +80,7 @@ async function updateJobDetails(req: Request, res: Response) {
     }
     res.status(200).json(updatedJob);
   } catch (error) {
+    console.error("Error updating a job", error);
     next(error);
   }
 }
