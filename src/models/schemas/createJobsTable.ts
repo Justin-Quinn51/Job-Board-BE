@@ -16,7 +16,7 @@ async function createJobsTable() {
  `;
 
   try {
-    const result = await pool.query(createTable);
+    await pool.query(createTable);
     console.log("Table 'jobs' created successfully");
   } catch (error) {
     console.error("Error creating 'jobs' table:", error);
