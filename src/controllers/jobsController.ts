@@ -20,6 +20,12 @@ async function getJobs(req: Request, res: Response) {
 
 async function getJob(req: Request, res: Response) {
   const jobId = req.params.id;
+
+  if (!jobId) {
+    res.status(400).json({ error: "jobId is required" });
+    return;
+  }
+
   try {
     const job = await getJobById(jobId);
     if (!job) {
@@ -56,6 +62,11 @@ async function updateJobDetails(req: Request, res: Response) {
   const jobId = req.params.id;
   const updates = req.body;
 
+  if (!jobId) {
+    res.status(400).json({ error: "jobId is required" });
+    return;
+  }
+
   try {
     const updatedJob = await updateJob(jobId, updates);
     if (!updatedJob) {
@@ -63,13 +74,18 @@ async function updateJobDetails(req: Request, res: Response) {
     }
     res.status(200).json(updatedJob);
   } catch (error) {
-    console.error("Error updating a job", error);
-    res.status(500).json({ error: "Failed to update job" });
+    next(error);
   }
 }
 
 async function closeJobById(req: Request, res: Response) {
   const jobId = req.params.id;
+
+  if (!jobId) {
+    res.status(400).json({ error: "jobId is required" });
+    return;
+  }
+
   try {
     const closedJob = await closeJob(jobId, true);
     res.status(200).json(closedJob);
@@ -80,6 +96,12 @@ async function closeJobById(req: Request, res: Response) {
 
 async function deleteJobById(req: Request, res: Response) {
   const jobId = req.params.id;
+
+  if (!jobId) {
+    res.status(400).json({ error: "jobId is required" });
+    return;
+  }
+
   try {
     await deleteJob(jobId);
     res.status(204).send();
