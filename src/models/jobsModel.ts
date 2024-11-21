@@ -93,7 +93,7 @@ async function closeJob(id: string, closed: boolean) {
 
 async function deleteJob(id: string) {
   const deleteJobQuery = "DELETE FROM jobs WHERE id = $1";
-  const result = await pool.query(deleteJobQuery, [id]);
+  await pool.query(deleteJobQuery, [id]);
 }
 
 export { getAllJobs, getJobById, createNewJob, updateJob, closeJob, deleteJob };
