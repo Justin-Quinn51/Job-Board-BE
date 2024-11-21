@@ -72,7 +72,13 @@ async function updateJob(id: string, updates: JobDataUpdates) {
   // as keyof allows Typescript to recognize field as a valid key of JobDataUpdates
   const updateJobValues = [
     id,
-    ...fields.map((field) => updates[field as keyof JobDataUpdates]),
+    ...fields.map((field) => {
+      const value = updates[field as keyof JobDataUpdates];
+      if (value === undefined) {
+        throw new Error(`Invalid field: ${field}`);
+      }
+      return value;
+    }),
   ];
 
   const result = await pool.query(updateJobQuery, updateJobValues);
