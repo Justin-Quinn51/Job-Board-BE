@@ -6,21 +6,26 @@ import {
   updateJob,
   closeJob,
   deleteJob,
+  type JobDataUpdates,
 } from "../models/jobsModel.ts";
 
-async function getJobs(req: Request, res: Response) {
-  const { closed } = req.params;
-  console.log(closed);
-  try {
-    const jobs = await getAllJobs();
-    res.status(200).json(jobs);
-  } catch (error) {
-    console.error("Error fetching jobs:", error);
-    res.status(500).json({ error: "Failed to retrieve jobs." });
-  }
+interface RequestParams {
+  id: string;
 }
 
-async function getJob(req: Request, res: Response) {
+async function getJobs(req: Request, res: Response): Promise<void> {
+  const { closed } = req.params;
+  console.log(closed);
+  const jobs = await getAllJobs();
+
+  if (!jobs) {
+    res.status(500).json({ error: "Failed to retrieve jobs." });
+    return;
+  }
+  res.status(200).json(jobs);
+}
+
+async function getJob(req: Request, res: Response): Promise<void> {
   const jobId = req.params.id;
 
   if (!jobId) {
@@ -28,43 +33,41 @@ async function getJob(req: Request, res: Response) {
     return;
   }
 
-  try {
-    const job = await getJobById(jobId);
-    if (!job) {
-      res.status(404).json({ error: "Job not found." });
-    }
-    res.status(200).json(job);
-  } catch (error) {
-    console.error("Error fetching job:", error);
-    res.status(500).json({ error: "Failed to retrieve job." });
+  const job = await getJobById(jobId);
+
+  if (!job) {
+    res.status(404).json({ error: "Job not found." });
+    return;
   }
+  res.status(200).json(job);
 }
 
-async function createJob(req: Request, res: Response) {
+async function createJob(req: Request, res: Response): Promise<void> {
   const { id, job_title, description, date_added, expires, closed, employer } =
     req.body;
-  try {
-    const newJob = await createNewJob(
-      id,
-      job_title,
-      description,
-      new Date(date_added),
-      new Date(expires),
-      closed,
-      employer,
-    );
-    res.status(201).json(newJob);
-  } catch (error) {
-    console.error("Error adding a new job:", error);
-    res.status(500).json({ error: "Failed to create job." });
+  const newJob = await createNewJob(
+    id,
+    job_title,
+    description,
+    new Date(date_added),
+    new Date(expires),
+    closed,
+    employer,
+  );
+
+  if (!newJob) {
+    res.status(400).json({ error: "job not created" });
   }
+  res.status(201).json(newJob);
 }
 
 async function updateJobDetails(
-  req: Request,
+  // RequestParams represents the interface for route parameters (params)
+  // '{}': represents the type for the response body (empty object)
+  // 'JobDataUpdates' represents the imported custom type for the request body
+  req: Request<RequestParams, {}, JobDataUpdates>,
   res: Response,
-  next: NextFunction,
-) {
+): Promise<void> {
   const jobId = req.params.id;
   const updates = req.body;
 
@@ -73,19 +76,15 @@ async function updateJobDetails(
     return;
   }
 
-  try {
-    const updatedJob = await updateJob(jobId, updates);
-    if (!updatedJob) {
-      return res.status(404).json({ error: "Job not found." });
-    }
-    res.status(200).json(updatedJob);
-  } catch (error) {
-    console.error("Error updating a job", error);
-    next(error);
+  const updatedJob = await updateJob(jobId, updates);
+  if (!updatedJob) {
+    res.status(404).json({ error: "Job not updated." });
+    return;
   }
+  res.status(200).json(updatedJob);
 }
 
-async function closeJobById(req: Request, res: Response) {
+async function closeJobById(req: Request, res: Response): Promise<void> {
   const jobId = req.params.id;
 
   if (!jobId) {
@@ -93,15 +92,16 @@ async function closeJobById(req: Request, res: Response) {
     return;
   }
 
-  try {
-    const closedJob = await closeJob(jobId, true);
-    res.status(200).json(closedJob);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to close job." });
+  const closedJob = await closeJob(jobId, true);
+
+  if (!closedJob) {
+    res.status(404).json({ error: "Job not found" });
+    return;
   }
+  res.status(200).json(closedJob);
 }
 
-async function deleteJobById(req: Request, res: Response) {
+async function deleteJobById(req: Request, res: Response): Promise<void> {
   const jobId = req.params.id;
 
   if (!jobId) {
@@ -109,12 +109,8 @@ async function deleteJobById(req: Request, res: Response) {
     return;
   }
 
-  try {
-    await deleteJob(jobId);
-    res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ error: "Failed to delete job" });
-  }
+  await deleteJob(jobId);
+  res.status(204).send();
 }
 
 export {
