@@ -9,7 +9,7 @@ import {
   deleteJobById,
 } from "../controllers/jobsController.ts";
 
-const router = Router();
+const router: Router = Router();
 
 router.get("/", asyncHandler(getJobs));
 router.post("/", asyncHandler(createJob));
