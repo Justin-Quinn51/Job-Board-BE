@@ -1,3 +1,4 @@
+import asyncHandler from "express-async-handler";
 import { Router } from "express";
 import {
   getJobs,
@@ -10,11 +11,11 @@ import {
 
 const router = Router();
 
-router.get("/", getJobs);
-router.post("/", createJob);
-router.get("/:id", getJob);
-router.put("/:id", updateJobDetails);
-router.put("/:id", closeJobById);
-router.delete("/:id", deleteJobById);
+router.get("/", asyncHandler(getJobs));
+router.post("/", asyncHandler(createJob));
+router.get("/:id", asyncHandler(getJob));
+router.put("/:id/update", asyncHandler(updateJobDetails));
+router.put("/:id/close", asyncHandler(closeJobById));
+router.delete("/:id", asyncHandler(deleteJobById));
 
 export default router;
