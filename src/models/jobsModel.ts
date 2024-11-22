@@ -1,6 +1,16 @@
 import pool from "../config/db.ts";
 
-type JobDataUpdates = {
+interface Job {
+  id: string;
+  job_title: string;
+  description: string;
+  date_added: Date;
+  expires: Date;
+  closed: boolean;
+  employer: string;
+}
+
+export type JobDataUpdates = {
   job_title?: string;
   description?: string;
   expires?: Date;
@@ -8,16 +18,16 @@ type JobDataUpdates = {
   employer?: string;
 };
 
-async function getAllJobs() {
+async function getAllJobs(): Promise<Job[]> {
   const fetchJobsQuery = "SELECT * FROM jobs";
   const result = await pool.query(fetchJobsQuery);
   return result.rows;
 }
 
-async function getJobById(id: string) {
+async function getJobById(id: string): Promise<Job | null> {
   const fetchJobQuery = "SELECT * FROM jobs WHERE id = $1";
   const result = await pool.query(fetchJobQuery, [id]);
-  return result.rows[0];
+  return result.rows[0] || null;
 }
 
 async function createNewJob(
@@ -28,7 +38,7 @@ async function createNewJob(
   expires: Date,
   closed: boolean,
   employer: string,
-) {
+): Promise<Job> {
   const createJobQuery =
     "INSERT INTO jobs (id, job_title, description, date_added, expires, closed, employer) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *";
   const jobValues = [
@@ -44,7 +54,10 @@ async function createNewJob(
   return result.rows[0];
 }
 
-async function updateJob(id: string, updates: JobDataUpdates) {
+async function updateJob(
+  id: string,
+  updates: JobDataUpdates,
+): Promise<Job | null> {
   // Stores each column of the jobs table that can be edited in an array
   const fields = Object.keys(updates);
   if (fields.length === 0) {
@@ -83,10 +96,10 @@ async function updateJob(id: string, updates: JobDataUpdates) {
 
   const result = await pool.query(updateJobQuery, updateJobValues);
 
-  return result.rows[0];
+  return result.rows[0] || null;
 }
 
-async function closeJob(id: string, closed: boolean) {
+async function closeJob(id: string, closed: boolean): Promise<Job | null> {
   if (closed) {
     throw new Error("Job is already closed.");
   }
@@ -94,10 +107,10 @@ async function closeJob(id: string, closed: boolean) {
   const closeJobQuery = "UPDATE jobs SET closed = $2 WHERE id = $1 RETURNING *";
   const closeJobValues = [id, closed];
   const result = await pool.query(closeJobQuery, closeJobValues);
-  return result.rows[0];
+  return result.rows[0] || null;
 }
 
-async function deleteJob(id: string) {
+async function deleteJob(id: string): Promise<void> {
   const deleteJobQuery = "DELETE FROM jobs WHERE id = $1";
   await pool.query(deleteJobQuery, [id]);
 }
